@@ -11,43 +11,55 @@ var isAuthenticated = function (req, res, next) {
     res.redirect('/');
 }
 
-module.exports = function (passport) {
+module.exports = function (passport, subscribe) {
 
     /* GET login page. */
     router.get('/', function (req, res) {
         // Display the Login page with any flash message, if any
-        res.render('index', {
-                message: req.flash('message'),
-                title: "hi"
-            }
-        );
+
+        res.json({message: req.flash('message')});
     });
 
     /* Handle Login POST */
-    router.post('/login', passport.authenticate('login', {
-        successRedirect: '/home',
-        failureRedirect: '/',
-        failureFlash: true
-    }));
-
-    /* GET Registration Page */
-    router.get('/signup', function (req, res) {
-        res.render('register', {message: req.flash('message')});
-    });
+    router.post('/login', passport.authenticate('login', {session: false}),
+        function (req, res) {
+            var message = req.flash('message');
+            if (message.length > 0) {
+                console.log("here not undef");
+                res.json({message: message});
+            } else {
+                console.log("here undef");
+                subscribe.getSeries(req, res)
+            }
+        });
 
     /* Handle Registration POST */
-    router.post('/signup', passport.authenticate('signup', {
-        successRedirect: '/home',
-        failureRedirect: '/signup',
-        failureFlash: true
-    }));
+    router.post('/signup', passport.authenticate('signup', {session: false}),
+        function (req, res) {
+            var message = req.flash('message');
+            if (message.length > 0) {
+                console.log("here not undef");
+                res.json({message: message});
+            } else {
+                console.log("here undef");
+                res.json({id: req.user.id, username: req.user.username});
+            }
+        });
 
-    /* Handle Registration POST mobile */
-    router.post('/signup_mobile', passport.authenticate('signup', {
-        successRedirect: '/home',
-        failureRedirect: '/signup',
-        failureFlash: true
-    }));
+    /* Handle Subscription POST */
+    router.post('/subscribe', function (req, res) {
+        subscribe.addSerieToUser(req);
+    });
+
+    /* Handle UnSubscription POST */
+    router.post('/unsubscribe', function (req, res) {
+        subscribe.deleteSeries(req);
+    });
+
+    /* Handle updateSeries POST */
+    router.post('/updateseries', function (req, res) {
+        subscribe.updateseries(req);
+    });
 
     /* GET Home Page */
     router.get('/home', isAuthenticated, function (req, res) {

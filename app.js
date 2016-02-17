@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
+var subscribe = require('./app/subscribe.js')
 
 var dbConfig = require('./db');
 var mongoose = require('mongoose');
@@ -48,7 +49,7 @@ app.use(flash());
 var initPassport = require('./passport/init');
 initPassport(passport);
 
-var routes = require('./routes/index')(passport);
+var routes = require('./routes/index')(passport, subscribe);
 app.use('/', routes);
 
 /// catch 404 and forward to error handler
