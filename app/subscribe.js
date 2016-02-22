@@ -25,6 +25,9 @@ var mod = module.exports = {
         newSeries.title = data.title;
         newSeries.showId = data.showId;
         newSeries.userId = data.userId;
+        newSeries.overview = data.overview;
+        newSeries.posterPath = data.posterPath;
+        newSeries.backPath = data.backPath;
         newSeries.seasons = data.seasons;
         newSeries.save(function (err) {
             if (err) {
